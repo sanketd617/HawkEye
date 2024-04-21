@@ -21,7 +21,7 @@ class Hawk {
         Hawk(int pins[MOTOR_COUNT]);
         void calibrate();
         bool isFlying();
-        void move(Speed speed);
+        void move(Speed speed, float roll, float pitch);
 };
 
 #endif

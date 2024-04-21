@@ -48,6 +48,7 @@ bool Hawk::isFlying() {
     return false;
 }
 
-void Hawk::move(Speed speed) {
+void Hawk::move(Speed speed, float roll, float pitch) {
+    Serial.printf("Speed: %.2f\tRoll: %.2f\tPitch: %.2f\n", speed.y, roll, pitch);
     spinAllMotors(speed.y);
 }
