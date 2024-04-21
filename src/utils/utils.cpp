@@ -2,11 +2,11 @@
 #include "defs.h"
 
 void blink(int blinkRate, int blinkDuration) {
-  pinMode(LED_PIN, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
   for (int i = 0; i < blinkDuration; i += blinkRate) {
-    digitalWrite(LED_PIN, HIGH);
+    digitalWrite(LED_BUILTIN, HIGH);
     delay((float) blinkRate / 2);
-    digitalWrite(LED_PIN, LOW);
+    digitalWrite(LED_BUILTIN, LOW);
     delay((float) blinkRate / 2);
   }
 }
