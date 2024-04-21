@@ -1,7 +1,9 @@
 #include <Arduino.h>
+
 #include "utils/defs.h"
 #include "hawk/hawk.h"
 #include "dualsense/dualsense.h"
+#include "structs/structs.h";
 
 Hawk hawk((int[]) HAWK_PINS);
 DualSense dualSense;
@@ -24,4 +26,7 @@ void loop() {
     dualSense.resetCalibrationFlags();
     return;
   }
+
+  Speed speed = dualSense.getRequestedSpeed();
+  hawk.move(speed);
 }

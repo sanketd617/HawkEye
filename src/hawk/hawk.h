@@ -1,5 +1,6 @@
 #include <ESP32Servo.h>
-#include "utils/defs.h"
+
+#include "structs/structs.h"
 
 #ifndef HAWK_H
 #define HAWK_H
@@ -20,6 +21,7 @@ class Hawk {
         Hawk(int pins[MOTOR_COUNT]);
         void calibrate();
         bool isFlying();
+        void move(Speed speed);
 };
 
 #endif

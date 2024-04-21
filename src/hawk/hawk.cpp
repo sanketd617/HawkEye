@@ -2,6 +2,8 @@
 
 #include "hawk/hawk.h"
 #include "utils/utils.h"
+#include "utils/defs.h"
+#include "structs/structs.h"
 
 Hawk::Hawk(int pins[MOTOR_COUNT]) {
     for (int i = 0; i < MOTOR_COUNT; i++) {
@@ -44,4 +46,8 @@ bool Hawk::isFlying() {
         }
     }
     return false;
+}
+
+void Hawk::move(Speed speed) {
+    spinAllMotors(speed.y);
 }
