@@ -5,50 +5,86 @@
 #include "utils/defs.h"
 #include "structs/structs.h"
 
-Hawk::Hawk(int pins[MOTOR_COUNT]) {
-    for (int i = 0; i < MOTOR_COUNT; i++) {
-        this->pins[i] = pins[i];
+Hawk::Hawk(int pins[WING_COUNT]) {
+    for (int i = 0; i < WING_COUNT; i++) {
+        wingPins[i] = pins[i];
     }
     
-    for (int i = 0; i < MOTOR_COUNT; i++) {
-        motors[i].attach(pins[i], MIN_PULSE, MAX_PULSE);
+    for (int i = 0; i < WING_COUNT; i++) {
+        wings[i].attach(pins[i], MIN_PULSE, MAX_PULSE);
     }
+}
+
+void Hawk::initialize() {
+    motionSensor.initialize();
 }
 
 void Hawk::calibrate() {
+    Serial.println("Calibrating motion sensor..");
+    motionSensor.calibrate();
     Serial.println("Calibrating motors..");
-    blink(100, 1000); // TODO: Restart the motors
-    spinAllMotors(100.0);
-    blink(100, 10000);
-    spinAllMotors(0.0);
-    blink(100, 5000);
-    spinAllMotors(10.0);
-    blink(100, 5000);
-    spinAllMotors(0.0);
-    Serial.println("Motors calibrated..");
+
+    // TODO: Restart the motors
+    std::fill(wingThrottles, wingThrottles + WING_COUNT, 100.0);
+    adjustThrottles();
+    blink(1000, 10000);
+    std::fill(wingThrottles, wingThrottles + WING_COUNT, 0.0);
+    adjustThrottles();
+    blink(1000, 2000);
+    std::fill(wingThrottles, wingThrottles + WING_COUNT, 50.0);
+    adjustThrottles();
+    blink(1000, 2000);
+    std::fill(wingThrottles, wingThrottles + WING_COUNT, 0.0);
+    adjustThrottles();
+    Serial.println("Calibration finish");
 }
 
-void Hawk::spinAllMotors(float speed) {
-    if (speed > MAX_MOTOR_SPEED || speed < MIN_MOTOR_SPEED) {
-        throw std::runtime_error("Invalid speed! Acceptable range is [0.0 to 100.0]. Given speed: " + std::to_string(speed));
+void Hawk::adjustThrottles() {
+    balance();
+    // printThrottles();
+    for (int i = 0; i < WING_COUNT; i++) {
+        if (wingThrottles[i] > MAX_WING_THROTTLE || wingThrottles[i] < MIN_WING_THROTTLE) {
+            Serial.println("Invalid throttle! Acceptable range is [0.0 to 100.0]");
+            throw std::runtime_error("Invalid throttle! Acceptable range is [0.0 to 100.0]");
+        }
     }
-    int pulse = MIN_PULSE + speed * 10;
-    for (int i = 0; i < MOTOR_COUNT; i++) {
-        motorSpeeds[i] = speed;
-        motors[i].writeMicroseconds(pulse);
+    
+    for (int i = 0; i < WING_COUNT; i++) {
+        int pulse = MIN_PULSE + wingThrottles[i] * 10;
+        wingThrottles[i] = wingThrottles[i];
+        wings[i].writeMicroseconds(pulse);
     }
 }
 
 bool Hawk::isFlying() {
-    for (int i = 0; i < MOTOR_COUNT; i++) {
-        if (motorSpeeds[i] != 0) {
+    for (int i = 0; i < WING_COUNT; i++) {
+        if (wingThrottles[i] != 0) {
             return true;
         }
     }
     return false;
 }
 
-void Hawk::move(Speed speed, float roll, float pitch) {
-    Serial.printf("Speed: %.2f\tRoll: %.2f\tPitch: %.2f\n", speed.y, roll, pitch);
-    spinAllMotors(speed.y);
+void Hawk::followInstruction(Instruction instruction) {
+    if (instruction.activeWing == ALL_WINGS) {
+        for (int i = 0; i < WING_COUNT; i++) {
+            wingThrottles[i] = min(max(MIN_WING_THROTTLE, (double) wingThrottles[i] + instruction.deltaSpeed), LIMITED_MAX_WING_THROTTLE);
+        }
+        adjustThrottles();
+        return;
+    }
+    wingThrottles[instruction.activeWing] = min(max(MIN_WING_THROTTLE, (double) wingThrottles[instruction.activeWing] + instruction.deltaSpeed), LIMITED_MAX_WING_THROTTLE);
+    adjustThrottles();
+}
+
+void Hawk::balance() {
+    motionSensor.sense();
+    Serial.printf("Roll: %f\tPitch: %f\n", motionSensor.getRoll(), motionSensor.getPitch());
+}
+
+void Hawk::printThrottles() {
+    Serial.printf("\t%.2f\t%.2f\n", wingThrottles[FRONT_LEFT_WING], wingThrottles[FRONT_RIGHT_WING]);
+    Serial.println("            \\  /");
+    Serial.println("            /  \\");
+    Serial.printf("\t%.2f\t%.2f\n", wingThrottles[REAR_LEFT_WING], wingThrottles[REAR_RIGHT_WING]);
 }

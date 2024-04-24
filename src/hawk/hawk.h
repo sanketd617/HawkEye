@@ -1,27 +1,30 @@
 #include <ESP32Servo.h>
 
 #include "structs/structs.h"
+#include "utils/defs.h"
+#include "sensors/motionsensor.h"
 
 #ifndef HAWK_H
 #define HAWK_H
 
-#define MOTOR_COUNT 4
-#define MAX_MOTOR_SPEED 100.0
-#define MIN_MOTOR_SPEED 0.0
-
 class Hawk {
     private:
-        Servo motors[MOTOR_COUNT];
-        int pins[MOTOR_COUNT];
-        float motorSpeeds[4];
+        Servo wings[WING_COUNT];
+        MotionSensor motionSensor;
+        int wingPins[WING_COUNT];
+        double wingThrottles[4];
 
-        void spinAllMotors(float speed);
+        void adjustThrottles();
+        void balance();
+        void printThrottles();
 
     public:
-        Hawk(int pins[MOTOR_COUNT]);
+        Hawk(int wingPins[WING_COUNT]);
+        
+        void initialize();
         void calibrate();
         bool isFlying();
-        void move(Speed speed, float roll, float pitch);
+        void followInstruction(Instruction Instruction);
 };
 
 #endif

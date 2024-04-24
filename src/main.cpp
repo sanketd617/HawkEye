@@ -9,15 +9,15 @@
 Hawk hawk((int[]) HAWK_PINS);
 DualSense dualSense;
 
-MotionSensor motionSensor;
-
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   while(!Serial);
 
-  motionSensor.calibrate();
-
+  delay(100);
+  Wire.begin();
+  delay(100);
   dualSense.connect();
+  hawk.initialize();
 }
 
 void loop() {
@@ -32,6 +32,5 @@ void loop() {
     return;
   }
 
-  motionSensor.sense();
-  hawk.move(dualSense.getRequestedSpeed(), motionSensor.getRoll(), motionSensor.getPitch());
+  hawk.followInstruction(dualSense.readInstruction());
 }

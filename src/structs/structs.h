@@ -1,8 +1,11 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
-struct Speed {
-    float x, y, z;
+struct Instruction {
+    double deltaSpeed;
+    double deltaRoll;
+    double deltaPitch;
+    int activeWing;
 };
 
 #endif
