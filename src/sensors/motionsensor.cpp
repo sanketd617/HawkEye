@@ -21,10 +21,6 @@ void MotionSensor::initialize() {
 void MotionSensor::calibrate() {    
     sensor.CalibrateAccel();
     sensor.CalibrateGyro();
-
-    Serial.printf("Gyro: %f, %f, %f\n", sensor.getXGyroOffset(), sensor.getYGyroOffset(), sensor.getZGyroOffset());
-    Serial.printf("Accel: %f, %f, %f\n", sensor.getXAccelOffset(), sensor.getYAccelOffset(), sensor.getZAccelOffset());
-    delay(10000);
 }
 
 void MotionSensor::sense() {

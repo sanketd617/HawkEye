@@ -12,7 +12,8 @@ class Hawk {
         Servo wings[WING_COUNT];
         MotionSensor motionSensor;
         int wingPins[WING_COUNT];
-        double wingThrottles[4];
+        double wingThrottles[WING_COUNT];
+        bool isCalibrating;
 
         void adjustThrottles();
         void balance();

@@ -13,6 +13,7 @@ Hawk::Hawk(int pins[WING_COUNT]) {
     for (int i = 0; i < WING_COUNT; i++) {
         wings[i].attach(pins[i], MIN_PULSE, MAX_PULSE);
     }
+    isCalibrating = false;
 }
 
 void Hawk::initialize() {
@@ -20,6 +21,7 @@ void Hawk::initialize() {
 }
 
 void Hawk::calibrate() {
+    isCalibrating = true;
     Serial.println("Calibrating motion sensor..");
     motionSensor.calibrate();
     Serial.println("Calibrating motors..");
@@ -31,17 +33,21 @@ void Hawk::calibrate() {
     std::fill(wingThrottles, wingThrottles + WING_COUNT, 0.0);
     adjustThrottles();
     blink(1000, 2000);
-    std::fill(wingThrottles, wingThrottles + WING_COUNT, 50.0);
+    std::fill(wingThrottles, wingThrottles + WING_COUNT, 10.0);
     adjustThrottles();
-    blink(1000, 2000);
+    blink(1000, 5000);
     std::fill(wingThrottles, wingThrottles + WING_COUNT, 0.0);
     adjustThrottles();
     Serial.println("Calibration finish");
+    isCalibrating = false;
 }
 
 void Hawk::adjustThrottles() {
-    balance();
-    // printThrottles();
+    if (!isCalibrating) {
+        balance();
+    }
+    
+    printThrottles();
     for (int i = 0; i < WING_COUNT; i++) {
         if (wingThrottles[i] > MAX_WING_THROTTLE || wingThrottles[i] < MIN_WING_THROTTLE) {
             Serial.println("Invalid throttle! Acceptable range is [0.0 to 100.0]");
