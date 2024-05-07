@@ -25,6 +25,8 @@ class Hawk {
         void initialize();
         void calibrate();
         bool isFlying();
+        void disableWings();
+        void enableWings();
         void followInstruction(Instruction Instruction);
 };
 

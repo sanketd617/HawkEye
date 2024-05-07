@@ -17,23 +17,34 @@ Hawk::Hawk(int pins[WING_COUNT]) {
 }
 
 void Hawk::initialize() {
+    pinMode(WING_SWITCH_PIN, OUTPUT);
     motionSensor.initialize();
 }
 
+void Hawk::disableWings() {
+    digitalWrite(WING_SWITCH_PIN, HIGH);
+}
+
+void Hawk::enableWings() {
+    digitalWrite(WING_SWITCH_PIN, LOW);
+}
+
 void Hawk::calibrate() {
+    disableWings();
+
     isCalibrating = true;
     Serial.println("Calibrating motion sensor..");
     motionSensor.calibrate();
     Serial.println("Calibrating motors..");
 
-    // TODO: Restart the motors
     std::fill(wingThrottles, wingThrottles + WING_COUNT, 100.0);
     adjustThrottles();
-    blink(1000, 10000);
+    enableWings();
+    blink(1000, 2000);
     std::fill(wingThrottles, wingThrottles + WING_COUNT, 0.0);
     adjustThrottles();
     blink(1000, 2000);
-    std::fill(wingThrottles, wingThrottles + WING_COUNT, 10.0);
+    std::fill(wingThrottles, wingThrottles + WING_COUNT, 5.0);
     adjustThrottles();
     blink(1000, 5000);
     std::fill(wingThrottles, wingThrottles + WING_COUNT, 0.0);
