@@ -10,3 +10,7 @@ void blink(int blinkRate, int blinkDuration) {
     delay((double) blinkRate / 2);
   }
 }
+
+double lowPassFilter(double currentValue, double previousValue, double alpha) {
+  return alpha * currentValue + (1 - alpha) * previousValue;
+}

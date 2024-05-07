@@ -49,7 +49,7 @@ void Hawk::calibrate() {
     blink(1000, 5000);
     std::fill(wingThrottles, wingThrottles + WING_COUNT, 0.0);
     adjustThrottles();
-    Serial.println("Calibration finish");
+    Serial.println("Calibration finished");
     isCalibrating = false;
 }
 

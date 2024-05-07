@@ -11,6 +11,9 @@ class MotionSensor {
         double pitch;
         double roll;
         long startTime = millis();
+        double previousAccelerationX;
+        double previousAccelerationY;
+        double previousAccelerationZ;
 
     public:
         MotionSensor();

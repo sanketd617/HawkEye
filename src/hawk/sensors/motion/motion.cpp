@@ -7,6 +7,9 @@
 MotionSensor::MotionSensor() {
     pitch = DEFAULT_PITCH;
     roll = DEFAULT_ROLL;
+    previousAccelerationX = 0;
+    previousAccelerationY = 0;
+    previousAccelerationZ = ACCELERATION_DUE_TO_GRAVITY;
 }
 
 void MotionSensor::initialize() {
@@ -14,8 +17,8 @@ void MotionSensor::initialize() {
     sensor.initialize();
     delay(10);
 
-    sensor.setFullScaleAccelRange(MPU6050_GYRO_FS_500);
-    sensor.setFullScaleGyroRange(MPU6050_ACCEL_FS_8);
+    sensor.setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
+    sensor.setFullScaleGyroRange(MPU6050_GYRO_FS_500);
 }
 
 void MotionSensor::calibrate() {    
@@ -26,13 +29,16 @@ void MotionSensor::calibrate() {
 void MotionSensor::sense() {
     blink(100, 100);
 
-    int16_t ax, ay, az;
-    sensor.getAcceleration(&ax, &ay, &az);
+    int16_t rawAccelerationX, rawAccelerationY, rawAccelerationZ;
+    sensor.getAcceleration(&rawAccelerationX, &rawAccelerationY, &rawAccelerationZ);
     
-    // Convert raw accelerometer data to g-force; 16384 LSB per g
-    double accelerationX = ax / LSB_PER_G;
-    double accelerationY = ay / LSB_PER_G;
-    double accelerationZ = az / LSB_PER_G;
+    double accelerationX = lowPassFilter(rawAccelerationX / LSB_PER_G * ACCELERATION_DUE_TO_GRAVITY, previousAccelerationX, ACCELERATION_SMOOTHENING_FACTOR);
+    double accelerationY = lowPassFilter(rawAccelerationY / LSB_PER_G * ACCELERATION_DUE_TO_GRAVITY, previousAccelerationY, ACCELERATION_SMOOTHENING_FACTOR);
+    double accelerationZ = lowPassFilter(rawAccelerationZ / LSB_PER_G * ACCELERATION_DUE_TO_GRAVITY, previousAccelerationZ, ACCELERATION_SMOOTHENING_FACTOR);
+
+    previousAccelerationX = accelerationX;
+    previousAccelerationY = accelerationY;
+    previousAccelerationZ = accelerationZ;
     
     // Calculate pitch and roll angles in degrees
     pitch = atan2(-accelerationX, sqrt(accelerationY * accelerationY + accelerationZ * accelerationZ)) * RADIANS_TO_DEGREES_RATIO;
