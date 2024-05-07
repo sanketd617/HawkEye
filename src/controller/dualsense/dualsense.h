@@ -1,5 +1,5 @@
 #include "structs/structs.h"
-#include "utils/defs.h"
+#include "definitions/definitions.h"
 
 #ifndef DUALSENSE_H
 #define DUALSENSE_H

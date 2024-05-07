@@ -1,8 +1,8 @@
 #include <MPU6050.h>
 #include <Wire.h>
-#include "motionsensor.h"
+#include "hawk/sensors/motion/motion.h"
 #include "utils/utils.h"
-#include "utils/defs.h"
+#include "definitions/definitions.h"
 
 MotionSensor::MotionSensor() {
     pitch = DEFAULT_PITCH;

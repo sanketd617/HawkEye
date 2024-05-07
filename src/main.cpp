@@ -1,9 +1,9 @@
 #include <Arduino.h>
 
-#include "utils/defs.h"
+#include "definitions/definitions.h"
 #include "hawk/hawk.h"
-#include "dualsense/dualsense.h"
-#include "sensors/motionsensor.h"
+#include "controller/dualsense/dualsense.h"
+#include "hawk/sensors/motion/motion.h"
 #include "structs/structs.h"
 
 Hawk hawk((int[]) HAWK_PINS);

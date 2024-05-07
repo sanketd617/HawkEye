@@ -4,7 +4,7 @@
 
 #include "dualsense.h"
 #include "utils/utils.h"
-#include "utils/defs.h"
+#include "definitions/definitions.h"
 
 DualSense::DualSense() {
     calibrationRequestStartTime = DEFAULT_CALIBRATION_START_TIME;

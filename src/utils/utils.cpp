@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "defs.h"
+#include "definitions/definitions.h"
 
 void blink(int blinkRate, int blinkDuration) {
   pinMode(LED_BUILTIN, OUTPUT);

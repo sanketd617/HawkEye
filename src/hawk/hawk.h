@@ -1,8 +1,8 @@
 #include <ESP32Servo.h>
 
 #include "structs/structs.h"
-#include "utils/defs.h"
-#include "sensors/motionsensor.h"
+#include "definitions/definitions.h"
+#include "hawk/sensors/motion/motion.h"
 
 #ifndef HAWK_H
 #define HAWK_H

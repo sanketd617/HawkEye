@@ -2,7 +2,7 @@
 
 #include "hawk/hawk.h"
 #include "utils/utils.h"
-#include "utils/defs.h"
+#include "definitions/definitions.h"
 #include "structs/structs.h"
 
 Hawk::Hawk(int pins[WING_COUNT]) {
