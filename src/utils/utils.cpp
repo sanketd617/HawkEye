@@ -12,5 +12,5 @@ void blink(int blinkRate, int blinkDuration) {
 }
 
 double lowPassFilter(double currentValue, double previousValue, double alpha) {
-  return alpha * currentValue + (1 - alpha) * previousValue;
+  return alpha * currentValue + (1 - alpha) * (previousValue == UNDEFINED ? currentValue : previousValue);
 }

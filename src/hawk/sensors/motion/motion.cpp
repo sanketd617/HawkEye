@@ -5,11 +5,16 @@
 #include "definitions/definitions.h"
 
 MotionSensor::MotionSensor() {
-    pitch = DEFAULT_PITCH;
-    roll = DEFAULT_ROLL;
-    previousAccelerationX = 0;
-    previousAccelerationY = 0;
-    previousAccelerationZ = ACCELERATION_DUE_TO_GRAVITY;
+    previousAccelerationX = UNDEFINED;
+    previousAccelerationY = UNDEFINED;
+    previousAccelerationZ = UNDEFINED;
+    previousGyroscopeX = UNDEFINED;
+    previousGyroscopeY = UNDEFINED;
+    previousGyroscopeZ = UNDEFINED;
+    pitchFromGyroscope = UNDEFINED;
+    rollFromGyroscope = UNDEFINED;
+    pitchFromAccelerometer = UNDEFINED;
+    rollFromAccelerometer = UNDEFINED;
 }
 
 void MotionSensor::initialize() {
@@ -27,28 +32,40 @@ void MotionSensor::calibrate() {
 }
 
 void MotionSensor::sense() {
-    blink(100, 100);
-
-    int16_t rawAccelerationX, rawAccelerationY, rawAccelerationZ;
+    int16_t rawAccelerationX, rawAccelerationY, rawAccelerationZ, rawRotationRateX, rawRotationRateY, rawRotationRateZ;
     sensor.getAcceleration(&rawAccelerationX, &rawAccelerationY, &rawAccelerationZ);
+    sensor.getRotation(&rawRotationRateX, &rawRotationRateY, &rawRotationRateZ);
     
-    double accelerationX = lowPassFilter(rawAccelerationX / LSB_PER_G * ACCELERATION_DUE_TO_GRAVITY, previousAccelerationX, ACCELERATION_SMOOTHENING_FACTOR);
-    double accelerationY = lowPassFilter(rawAccelerationY / LSB_PER_G * ACCELERATION_DUE_TO_GRAVITY, previousAccelerationY, ACCELERATION_SMOOTHENING_FACTOR);
-    double accelerationZ = lowPassFilter(rawAccelerationZ / LSB_PER_G * ACCELERATION_DUE_TO_GRAVITY, previousAccelerationZ, ACCELERATION_SMOOTHENING_FACTOR);
+    double accelerationX = lowPassFilter(rawAccelerationX / LSB_PER_G * ACCELERATION_DUE_TO_GRAVITY, previousAccelerationX, SMOOTHENING_FACTOR);
+    double accelerationY = lowPassFilter(rawAccelerationY / LSB_PER_G * ACCELERATION_DUE_TO_GRAVITY, previousAccelerationY, SMOOTHENING_FACTOR);
+    double accelerationZ = lowPassFilter(rawAccelerationZ / LSB_PER_G * ACCELERATION_DUE_TO_GRAVITY, previousAccelerationZ, SMOOTHENING_FACTOR);
 
     previousAccelerationX = accelerationX;
     previousAccelerationY = accelerationY;
     previousAccelerationZ = accelerationZ;
-    
-    // Calculate pitch and roll angles in degrees
-    pitch = atan2(-accelerationX, sqrt(accelerationY * accelerationY + accelerationZ * accelerationZ)) * RADIANS_TO_DEGREES_RATIO;
-    roll = atan2(accelerationY, accelerationZ) * RADIANS_TO_DEGREES_RATIO;
+
+    if (pitchFromGyroscope == UNDEFINED) {
+        rollFromGyroscope =  atan2(accelerationY, accelerationZ) * RADIANS_TO_DEGREES_RATIO;
+        pitchFromGyroscope = atan2(-accelerationX, sqrt(accelerationY * accelerationY + accelerationZ * accelerationZ)) * RADIANS_TO_DEGREES_RATIO;
+        startTime = millis();
+    } else {
+        double deltaTime = (millis() - startTime) / 1000.0;
+        startTime = millis();
+        rollFromGyroscope = getRoll() + lowPassFilter(deltaTime * rawRotationRateX / LSB_PER_DEGREE_PER_S, previousGyroscopeX, SMOOTHENING_FACTOR);
+        pitchFromGyroscope = getPitch() + lowPassFilter(deltaTime * rawRotationRateY / LSB_PER_DEGREE_PER_S, previousGyroscopeY, SMOOTHENING_FACTOR);
+        previousGyroscopeX = lowPassFilter(deltaTime * rawRotationRateX / LSB_PER_DEGREE_PER_S, previousGyroscopeX, SMOOTHENING_FACTOR);
+        previousGyroscopeY = lowPassFilter(deltaTime * rawRotationRateY / LSB_PER_DEGREE_PER_S, previousGyroscopeY, SMOOTHENING_FACTOR);
+        previousGyroscopeZ = lowPassFilter(deltaTime * rawRotationRateZ / LSB_PER_DEGREE_PER_S, previousGyroscopeZ, SMOOTHENING_FACTOR);
+    }
+
+    pitchFromAccelerometer = atan2(-accelerationX, sqrt(accelerationY * accelerationY + accelerationZ * accelerationZ)) * RADIANS_TO_DEGREES_RATIO;
+    rollFromAccelerometer = atan2(accelerationY, accelerationZ) * RADIANS_TO_DEGREES_RATIO;
 }
 
 double MotionSensor::getRoll() {
-    return roll;
+    return lowPassFilter(rollFromAccelerometer, rollFromGyroscope, 0.02);
 }
 
 double MotionSensor::getPitch() {
-    return pitch;
+    return lowPassFilter(pitchFromAccelerometer, pitchFromGyroscope, 0.02);
 }
