@@ -5,6 +5,18 @@
 #include "definitions/definitions.h"
 
 MotionSensor::MotionSensor() {
+    initialize();
+}
+
+void MotionSensor::initialize() {
+    delay(10);
+    sensor.initialize();
+    delay(10);
+
+    sensor.setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
+    sensor.setFullScaleGyroRange(MPU6050_GYRO_FS_500);
+
+    startTime = UNDEFINED;
     previousAccelerationX = UNDEFINED;
     previousAccelerationY = UNDEFINED;
     previousAccelerationZ = UNDEFINED;
@@ -17,16 +29,8 @@ MotionSensor::MotionSensor() {
     rollFromAccelerometer = UNDEFINED;
 }
 
-void MotionSensor::initialize() {
-    delay(10);
-    sensor.initialize();
-    delay(10);
-
-    sensor.setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
-    sensor.setFullScaleGyroRange(MPU6050_GYRO_FS_500);
-}
-
 void MotionSensor::calibrate() {    
+    initialize();
     sensor.CalibrateAccel();
     sensor.CalibrateGyro();
 }

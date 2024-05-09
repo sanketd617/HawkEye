@@ -8,7 +8,7 @@
 class MotionSensor {
     private:
         MPU6050 sensor;
-        long startTime = millis();
+        long startTime;
         double previousGyroscopeX;
         double previousGyroscopeY;
         double previousGyroscopeZ;
