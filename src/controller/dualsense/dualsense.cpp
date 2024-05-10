@@ -75,16 +75,16 @@ Instruction DualSense::readInstruction() {
 
     int activeWing = ALL_WINGS;
 
-    if (ps5.Cross()) {
-        activeWing = REAR_RIGHT_WING;
+    if (ps5.Triangle()) {
+        activeWing = FRONT_LEFT_WING;
     }
 
     if (ps5.Circle()) {
         activeWing = FRONT_RIGHT_WING;
     }
 
-    if (ps5.Triangle()) {
-        activeWing = FRONT_LEFT_WING;
+    if (ps5.Cross()) {
+        activeWing = REAR_RIGHT_WING;
     }
 
     if (ps5.Square()) {
