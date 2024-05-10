@@ -83,14 +83,25 @@ bool Hawk::isFlying() {
 }
 
 void Hawk::followInstruction(Instruction instruction) {
-    if (instruction.activeWing == ALL_WINGS) {
+    bool isManual = false;
+
+    for (int i = 0; i < WING_COUNT; i++) {
+        isManual = isManual || instruction.manualModeWingFlags[i];
+    }
+
+    if (!isManual) {
         for (int i = 0; i < WING_COUNT; i++) {
-            wingThrottles[i] = min(max(MIN_WING_THROTTLE, (double) wingThrottles[i] + instruction.deltaSpeed), LIMITED_MAX_WING_THROTTLE);
+            wingThrottles[i] = min(max(MIN_WING_THROTTLE, (double) wingThrottles[i] + instruction.deltaThrottle), LIMITED_MAX_WING_THROTTLE);
         }
         adjustThrottles();
         return;
     }
-    wingThrottles[instruction.activeWing] = min(max(MIN_WING_THROTTLE, (double) wingThrottles[instruction.activeWing] + instruction.deltaSpeed), LIMITED_MAX_WING_THROTTLE);
+
+    for (int i = 0; i < WING_COUNT; i++) {
+        if (instruction.manualModeWingFlags[i]) {
+            wingThrottles[i] = min(max(MIN_WING_THROTTLE, (double) wingThrottles[i] + instruction.deltaThrottle), LIMITED_MAX_WING_THROTTLE);
+        }
+    }
     adjustThrottles();
 }
 

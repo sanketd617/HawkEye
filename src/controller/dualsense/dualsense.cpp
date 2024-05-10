@@ -73,24 +73,36 @@ Instruction DualSense::readInstruction() {
         deltaPitch = (double) ps5.LStickY() / (ps5.LStickY() < 0 ? -1 * MIN_JOYSTICK_VALUE : MAX_JOYSTICK_VALUE) * elapsedTime * ROLL_AND_PITCH_STEP_SIZE;
     }
 
-    int activeWing = ALL_WINGS;
+    Instruction instruction;
+
+    instruction.deltaThrottle = deltaThrottle;
+    instruction.deltaRoll = deltaRoll;
+    instruction.deltaPitch = deltaPitch;
 
     if (ps5.Triangle()) {
-        activeWing = FRONT_LEFT_WING;
+        instruction.manualModeWingFlags[FRONT_LEFT_WING] = true;
+    } else {
+        instruction.manualModeWingFlags[FRONT_LEFT_WING] = false;
     }
 
     if (ps5.Circle()) {
-        activeWing = FRONT_RIGHT_WING;
+        instruction.manualModeWingFlags[FRONT_RIGHT_WING] = true;
+    } else {
+        instruction.manualModeWingFlags[FRONT_RIGHT_WING] = false;
     }
 
     if (ps5.Cross()) {
-        activeWing = REAR_RIGHT_WING;
+        instruction.manualModeWingFlags[REAR_RIGHT_WING] = true;
+    } else {
+        instruction.manualModeWingFlags[REAR_RIGHT_WING] = false;
     }
 
     if (ps5.Square()) {
-        activeWing = REAR_LEFT_WING;
+        instruction.manualModeWingFlags[REAR_LEFT_WING] = true;
+    } else {
+        instruction.manualModeWingFlags[REAR_LEFT_WING] = false;
     }
 
     rampUpStartTime = currentTime;
-    return {deltaThrottle, deltaRoll, deltaPitch, activeWing};
+    return instruction;
 }

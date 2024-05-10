@@ -1,11 +1,13 @@
+#include "definitions/definitions.h"
+
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
 struct Instruction {
-    double deltaSpeed;
+    double deltaThrottle;
     double deltaRoll;
     double deltaPitch;
-    int activeWing;
+    bool manualModeWingFlags[WING_COUNT];
 };
 
 #endif

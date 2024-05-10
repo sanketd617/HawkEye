@@ -3,7 +3,6 @@
 #define MAX_PULSE 2000
 #define WING_COUNT 4
 #define HAWK_PINS {13, 26, 25, 27}
-#define ALL_WINGS -1
 #define FRONT_LEFT_WING 0
 #define FRONT_RIGHT_WING 1
 #define REAR_RIGHT_WING 2
